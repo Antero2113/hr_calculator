@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Таблица процессов</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+td, th { border: 1px solid #ccc; padding: 8px; }
+form { margin-bottom: 20px; display: none; }
+input, select { margin: 5px; }
+</style>
+</head>
+<body>
+
+<h2>Таблица</h2>
+
+<button onclick="toggleForm()">Добавить запись</button>
+
+<form id="form">
+    <input placeholder="ФИО" id="name">
+    <input placeholder="Отдел-регион" id="department_full">
+    <input placeholder="Должность" id="position">
+    <input placeholder="Клиент" id="client">
+    <input placeholder="Бизнес процесс" id="process_name">
+    <input placeholder="Операции" id="operations">
+
+    <select id="measure">
+        <option value="hours">Часы</option>
+        <option value="minutes">Минуты</option>
+    </select>
+
+    <input placeholder="Мин" id="min" type="number">
+    <input placeholder="Макс" id="max" type="number">
+
+    <select id="period_type">
+        <option value="week">в неделю</option>
+        <option value="month">в месяц</option>
+        <option value="quarter">в квартал</option>
+        <option value="year">в год</option>
+    </select>
+
+    <input placeholder="Количество" id="period_count" type="number">
+
+    <button type="button" onclick="addRecord()">Сохранить</button>
+</form>
+
+<table id="table">
+<thead>
+<tr>
+<th>ФИО</th>
+<th>Отдел</th>
+<th>Должность</th>
+<th>Клиент</th>
+<th>Процесс</th>
+<th>Операции</th>
+<th>Ед.</th>
+<th>Мин</th>
+<th>Макс</th>
+<th>Тип периода</th>
+<th>Частота</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+function toggleForm() {
+    const form = document.getElementById('form');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadTable() {
+    const res = await fetch('http://localhost:8080/api/commonTable');
+    const data = await res.json();
+
+    const tbody = document.querySelector('#table tbody');
+    tbody.innerHTML = '';
+
+    data.forEach(row => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${row.employee_name ?? ''}</td>
+            <td>${row.department ?? ''}</td>
+            <td>${row.position ?? ''}</td>
+            <td>${row.client ?? ''}</td>
+            <td>${row.process_name ?? ''}</td>
+            <td>${row.operations ?? ''}</td>
+            <td>${row.measure ?? ''}</td>
+            <td>${row.min ?? ''}</td>
+            <td>${row.max ?? ''}</td>
+            <td>${row.period_type ?? ''}</td>
+            <td>${row.period_count ?? ''}</td>
+        </tr>`;
+    });
+}
+
+async function addRecord() {
+    const data = {
+        name: document.getElementById('name').value,
+        department_full: document.getElementById('department_full').value,
+        position: document.getElementById('position').value,
+        client: document.getElementById('client').value,
+        process_name: document.getElementById('process_name').value,
+        operations: document.getElementById('operations').value,
+        measure: document.getElementById('measure').value,
+        min: document.getElementById('min').value,
+        max: document.getElementById('max').value,
+        period_type: document.getElementById('period_type').value,
+        period_count: document.getElementById('period_count').value
+    };
+
+    await fetch('http://localhost:8080/api/addRecord', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+
+    loadTable();
+}
+
+loadTable();
+</script>
+
+</body>
+</html>
