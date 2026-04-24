@@ -10,11 +10,8 @@ func GetTable(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
 			SELECT 
-				e.name,
-				CONCAT(e.region, ' ', e.department),
 				e.position,
 				jr.client,
-				pp.name,
 				pp.operations,
 				pp.measure,
 				pp.min,
@@ -23,9 +20,8 @@ func GetTable(db *sql.DB) http.HandlerFunc {
 				pp.period_count
 			FROM job_records jr
 			LEFT JOIN employees e ON jr.employee = e.id
-			LEFT JOIN processes p ON jr.process = p.id
-			LEFT JOIN process_processes_properties ppp ON p.id = ppp.process_id
-			LEFT JOIN process_properties pp ON ppp.property_id = pp.id
+			LEFT JOIN process_processes_properties ppp ON jr.process = ppp.process_id
+			LEFT JOIN process_properties pp ON ppp.property_id = pp.id;
 		`)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
@@ -38,29 +34,39 @@ func GetTable(db *sql.DB) http.HandlerFunc {
 
 		for rows.Next() {
 			var (
-				name, department, position, client,
-				processName, operations, measure, periodType string
-				min, max, periodCount                         int
+				position, client, operations, measure string
+				periodType sql.NullString
+				min, max sql.NullFloat64
+				periodCount sql.NullInt64
 			)
 
 			rows.Scan(
-				&name, &department, &position, &client,
-				&processName, &operations, &measure,
+				&position, &client,
+				&operations, &measure,
 				&min, &max, &periodType, &periodCount,
 			)
 
 			row := map[string]interface{}{
-				"employee_name": name,
-				"department":    department,
-				"position":      position,
-				"client":        client,
-				"process_name":  processName,
-				"operations":    operations,
-				"measure":       measure,
-				"min":           min,
-				"max":           max,
-				"period_type":   periodType,
-				"period_count":  periodCount,
+				"position":   position,
+				"client":     client,
+				"operations": operations,
+				"measure":    measure,
+				"min": func() interface{} {
+					if min.Valid { return min.Float64 }
+						return nil
+				}(),
+				"max": func() interface{} {
+					if max.Valid { return max.Float64 }
+						return nil
+				}(),
+				"period_type": func() interface{} {
+					if periodType.Valid { return periodType.String }
+				return nil
+				}(),
+				"period_count": func() interface{} {
+					if periodCount.Valid { return periodCount.Int64 }
+						return nil
+				}(),
 			}
 
 			result = append(result, row)

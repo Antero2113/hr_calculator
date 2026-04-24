@@ -18,11 +18,8 @@ input, select { margin: 5px; }
 <button onclick="toggleForm()">Добавить запись</button>
 
 <form id="form">
-    <input placeholder="ФИО" id="name">
-    <input placeholder="Отдел-регион" id="department_full">
     <input placeholder="Должность" id="position">
     <input placeholder="Клиент" id="client">
-    <input placeholder="Бизнес процесс" id="process_name">
     <input placeholder="Операции" id="operations">
 
     <select id="measure">
@@ -48,11 +45,8 @@ input, select { margin: 5px; }
 <table id="table">
 <thead>
 <tr>
-<th>ФИО</th>
-<th>Отдел</th>
 <th>Должность</th>
 <th>Клиент</th>
-<th>Процесс</th>
 <th>Операции</th>
 <th>Ед.</th>
 <th>Мин</th>
@@ -80,11 +74,8 @@ async function loadTable() {
     data.forEach(row => {
         tbody.innerHTML += `
         <tr>
-            <td>${row.employee_name ?? ''}</td>
-            <td>${row.department ?? ''}</td>
             <td>${row.position ?? ''}</td>
             <td>${row.client ?? ''}</td>
-            <td>${row.process_name ?? ''}</td>
             <td>${row.operations ?? ''}</td>
             <td>${row.measure ?? ''}</td>
             <td>${row.min ?? ''}</td>
@@ -97,11 +88,8 @@ async function loadTable() {
 
 async function addRecord() {
     const data = {
-        name: document.getElementById('name').value,
-        department_full: document.getElementById('department_full').value,
         position: document.getElementById('position').value,
         client: document.getElementById('client').value,
-        process_name: document.getElementById('process_name').value,
         operations: document.getElementById('operations').value,
         measure: document.getElementById('measure').value,
         min: document.getElementById('min').value,

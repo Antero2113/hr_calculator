@@ -5,15 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"project/models"
-	"project/utils"
 )
-
 func AddRecord(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var data models.Record
 		json.NewDecoder(r.Body).Decode(&data)
-
-		department, region := utils.ParseDepartment(data.DepartmentFull)
 
 		tx, err := db.Begin()
 		if err != nil {
@@ -22,8 +18,8 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 		}
 
 		res, err := tx.Exec(
-			"INSERT INTO employees (name, position, region, department) VALUES (?, ?, ?, ?)",
-			data.Name, data.Position, region, department,
+			"INSERT INTO employees (name, position, region, department) VALUES (?, ?, '', '')",
+			"", data.Position,
 		)
 		if err != nil {
 			tx.Rollback()
@@ -33,7 +29,9 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 
 		employeeId, _ := res.LastInsertId()
 
-		res, err = tx.Exec("INSERT INTO processes (space_id) VALUES (NULL)")
+		res, err = tx.Exec(
+			"INSERT INTO processes (space_id) VALUES (NULL)",
+		)
 		if err != nil {
 			tx.Rollback()
 			http.Error(w, err.Error(), 500)
@@ -44,7 +42,7 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 
 		res, err = tx.Exec(
 			"INSERT INTO process_properties (name, operations, measure, min, max, period_type, period_count) VALUES (?, ?, ?, ?, ?, ?, ?)",
-			data.ProcessName, data.Operations, data.Measure, data.Min, data.Max, data.PeriodType, data.PeriodCount,
+			"", data.Operations, data.Measure, data.Min, data.Max, data.PeriodType, data.PeriodCount,
 		)
 		if err != nil {
 			tx.Rollback()
