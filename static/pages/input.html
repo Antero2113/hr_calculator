@@ -1,0 +1,44 @@
+<h2>Таблица</h2>
+
+<button onclick="toggleForm()">Добавить запись</button>
+
+<form id="form">
+    <input placeholder="Должность" id="position">
+    <input placeholder="Клиент" id="client">
+    <input placeholder="Операции" id="operations">
+
+    <select id="measure">
+        <option value="hours">Часы</option>
+        <option value="minutes">Минуты</option>
+    </select>
+
+    <input placeholder="Мин" id="min" type="number">
+    <input placeholder="Макс" id="max" type="number">
+
+    <select id="period_type">
+        <option value="week">в неделю</option>
+        <option value="month">в месяц</option>
+        <option value="quarter">в квартал</option>
+        <option value="year">в год</option>
+    </select>
+
+    <input placeholder="Количество" id="period_count" type="number">
+
+    <button type="button" onclick="addRecord()">Сохранить</button>
+</form>
+
+<table id="table">
+<thead>
+<tr>
+<th>Должность</th>
+<th>Клиент</th>
+<th>Операции</th>
+<th>Ед.</th>
+<th>Мин</th>
+<th>Макс</th>
+<th>Тип периода</th>
+<th>Частота</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
