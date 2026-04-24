@@ -15,3 +15,9 @@ go run main.go
 ```
 ssh -L 3307:office.m18.ru:3306 antero@office.m18.ru
 ```
+
+```
+GOOS=linux GOARCH=amd64 go build -o calculator
+scp calculator antero@office.m18.ru:/srv/http/ru.m18/antero/htdocs/hr-calculator
+scp static/index.html antero@office.m18.ru:/srv/http/ru.m18/antero/htdocs/hr-calculator/static
+```
